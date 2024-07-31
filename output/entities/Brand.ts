@@ -1,17 +1,23 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Product } from './Product';
+import { Category } from './Category';
 
 @Entity('BRAND', { schema: 'dbo' })
 export class Brand {
-  @PrimaryGeneratedColumn('increment', { name: 'id' })
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
-  @Column('nvarchar', { name: 'name', nullable: true, length: 255 })
+  @Column('nvarchar', { name: 'name', nullable: true, length: 10 })
   name: string | null;
 
   @Column('nvarchar', { name: 'image', nullable: true, length: 255 })
   image: string | null;
 
-  @OneToMany(() => Product, (product) => product.idBrand2)
-  products: Product[];
+  @Column('datetime', { name: 'created_at', nullable: true })
+  createdAt: Date | null;
+
+  @Column('datetime', { name: 'updated_at', nullable: true })
+  updatedAt: Date | null;
+
+  @OneToMany(() => Category, (category) => category.idBrand)
+  categories: Category[];
 }

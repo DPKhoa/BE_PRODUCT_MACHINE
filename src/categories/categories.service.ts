@@ -1,39 +1,58 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import CreateCategoryDto from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from 'output/entities/Category';
 import { Repository } from 'typeorm';
-import { Product } from 'output/entities/Product';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     @InjectRepository(Category)
-    private readonly categoryRepository: Repository<Category>,
-    @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>,
+    private readonly categoryRespository: Repository<Category>,
   ) {}
-  create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+  async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
+    const category = this.categoryRespository.create({
+      ...createCategoryDto,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    return this.categoryRespository.save(category);
   }
 
-  async findAll(): Promise<Category[]> {
-    return this.categoryRepository.find();
+  async findAll(): Promise<{ categories: Category[] }> {
+    try {
+      const categories = await this.categoryRespository.find();
+      return { categories };
+    } catch (error) {
+      throw new Error('Failed to retrieve categories');
+    }
   }
 
   findOne(id: number) {
     return `This action returns a #${id} category`;
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  async updateCategory(id: number, updateCategoryDto: UpdateCategoryDto) {
+    const category = await this.categoryRespository.findOne({ where: { id } });
+    if (!category) {
+      throw new NotFoundException(`Category with ID ${id} nto found`);
+    }
+    category.updatedAt = new Date();
+    Object.assign(category, updateCategoryDto);
+    return this.categoryRespository.save(category);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async deleteCategory(id: number, idBrand: number): Promise<string> {
+    const result = await this.categoryRespository.delete({ id, idBrand });
+    if (result.affected === 0) {
+      throw new NotFoundException(
+        `Category with ID ${id} and Brand ID ${idBrand} not found`,
+      );
+    }
+    return `Category with ID ${id} successfully deleted`;
   }
 }

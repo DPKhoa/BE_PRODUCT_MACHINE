@@ -1,20 +1,34 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Product } from './Product';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Brand } from './Brand';
+// Ensure the path is correct
 
 @Entity('CATEGORY', { schema: 'dbo' })
 export class Category {
-  @PrimaryGeneratedColumn('increment', { name: 'id' })
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
+
+  @Column('int', { name: 'id_brand' })
+  idBrand: number;
 
   @Column('nvarchar', { name: 'name', nullable: true, length: 255 })
   name: string | null;
 
-  @Column('nvarchar', { name: 'image', nullable: true, length: 255 })
-  image: string | null;
-
   @Column('bit', { name: 'status', nullable: true })
   status: boolean | null;
 
-  @OneToMany(() => Product, (product) => product.idCategory2)
-  products: Product[];
+  @Column('datetime', { name: 'created_at', nullable: true })
+  createdAt: Date | null;
+
+  @Column('datetime', { name: 'updated_at', nullable: true })
+  updatedAt: Date | null;
+
+  @ManyToOne(() => Brand, (brand) => brand.categories)
+  @JoinColumn({ name: 'id_brand', referencedColumnName: 'id' })
+  brand: Brand;
 }

@@ -1,39 +1,46 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brand } from 'output/entities/Brand';
 import { Repository } from 'typeorm';
-import { Product } from 'output/entities/Product';
 
 @Injectable()
 export class BrandService {
   constructor(
     @InjectRepository(Brand)
     private readonly brandRepository: Repository<Brand>,
-    @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>,
   ) {}
   async create(createBrandDto: CreateBrandDto): Promise<Brand> {
-    const brand = this.brandRepository.create(createBrandDto);
+    const brand = this.brandRepository.create({
+      ...createBrandDto,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
     return this.brandRepository.save(brand);
   }
 
-  async findAll(): Promise<{ brands: Brand[]; products: Product[] }> {
+  async findAll(): Promise<{ brands: Brand[] }> {
     const brands = await this.brandRepository.find();
-    const products = await this.productRepository.find();
-    return { brands, products };
+    return { brands };
   }
 
   findOne(id: number) {
     return `This action returns a #${id} brand`;
   }
 
-  update(id: number, updateBrandDto: UpdateBrandDto) {
-    return `This action updates a #${id} brand`;
+  async updateBrand(id: number, updateBrandDto: UpdateBrandDto) {
+    const brand = await this.brandRepository.findOne({ where: { id } });
+    if (!brand) {
+      throw new NotFoundException(`Brand with ID ${id} not found`);
+    }
+    brand.updatedAt = new Date();
+    Object.assign(brand, updateBrandDto);
+
+    return this.brandRepository.save(brand);
   }
 
   remove(id: number) {

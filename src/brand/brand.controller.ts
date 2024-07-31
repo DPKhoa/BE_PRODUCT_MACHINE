@@ -12,34 +12,36 @@ import { BrandService } from './brand.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
 import { Brand } from 'output/entities/Brand';
-import { Product } from 'output/entities/Product';
 
 @Controller('brand')
 export class BrandController {
   constructor(private readonly brandService: BrandService) {}
 
-  @Post()
-  create(@Body() createBrandDto: CreateBrandDto) {
+  @Post('createBrand')
+  create(@Body() createBrandDto: CreateBrandDto): Promise<Brand> {
     return this.brandService.create(createBrandDto);
   }
 
   @Get('/getAllBrand')
-  async findAll(): Promise<{ brands: Brand[]; products: Product[] }> {
+  async findAll(): Promise<{ brands: Brand[] }> {
     return this.brandService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.brandService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBrandDto: UpdateBrandDto) {
-    return this.brandService.update(+id, updateBrandDto);
+  @Patch('updateBrand/:id')
+  async updateBrand(
+    @Param('id') id: number,
+    @Body() updateBrandDto: UpdateBrandDto,
+  ) {
+    return this.brandService.updateBrand(+id, updateBrandDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.brandService.remove(+id);
   }
 }

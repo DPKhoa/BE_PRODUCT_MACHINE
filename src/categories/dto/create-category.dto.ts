@@ -21,5 +21,5 @@ export default class CreateCategoryDto {
 
   @IsNotEmpty()
   @IsInt()
-  idBrand: number;
+  idBrand?: number;
 }

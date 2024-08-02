@@ -1,22 +1,43 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import CreateCategoryDto from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from 'output/entities/Category';
 import { Repository } from 'typeorm';
+import { Brand } from 'output/entities/Brand';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     @InjectRepository(Category)
     private readonly categoryRespository: Repository<Category>,
+    @InjectRepository(Brand)
+    private readonly brandRepository: Repository<Brand>,
   ) {}
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
+    const { idBrand, ...categoryDetails } = createCategoryDto;
+    let brand = null;
+    if (idBrand) {
+      brand = await this.brandRepository.findOne({
+        where: { id: idBrand },
+      });
+
+      if (!brand) {
+        throw new BadRequestException(
+          `Brand with ID ${idBrand} does not exist`,
+        );
+      }
+    }
     const category = this.categoryRespository.create({
-      ...createCategoryDto,
+      ...categoryDetails,
+      brand,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -46,13 +67,13 @@ export class CategoriesService {
     return this.categoryRespository.save(category);
   }
 
-  async deleteCategory(id: number, idBrand: number): Promise<string> {
-    const result = await this.categoryRespository.delete({ id, idBrand });
-    if (result.affected === 0) {
-      throw new NotFoundException(
-        `Category with ID ${id} and Brand ID ${idBrand} not found`,
-      );
-    }
-    return `Category with ID ${id} successfully deleted`;
-  }
+  // async deleteCategory(id: number, idBrand: number): Promise<string> {
+  //   const result = await this.categoryRespository.delete({ id, idBrand });
+  //   if (result.affected === 0) {
+  //     throw new NotFoundException(
+  //       `Category with ID ${id} and Brand ID ${idBrand} not found`,
+  //     );
+  //   }
+  //   return `Category with ID ${id} successfully deleted`;
+  // }
 }

@@ -10,5 +10,5 @@ export class CreateBrandDto {
   @IsOptional()
   @IsString()
   @Length(0, 255)
-  image?;
+  image?: string;
 }

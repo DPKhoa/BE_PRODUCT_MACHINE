@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { BrandModule } from './brand/brand.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ProductsModule } from './products/products.module';
 import config from '../ormconfig';
 
 @Module({
@@ -13,6 +14,7 @@ import config from '../ormconfig';
     TypeOrmModule.forRoot({ ...config, autoLoadEntities: true }),
     BrandModule,
     CategoriesModule,
+    ProductsModule,
 
   ],
   controllers: [AppController],

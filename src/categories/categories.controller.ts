@@ -1,13 +1,5 @@
 /* eslint-disable prettier/prettier */
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import CreateCategoryDto from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -40,12 +32,12 @@ export class CategoriesController {
     return this.categoriesService.updateCategory(+id, updateCategoryDto);
   }
 
-  @Delete(':id/brand/:idBrand')
-  async deleteCategory(
-    @Param('id') id: number,
-    @Param('idBrand') idBrand: number,
-  ): Promise<string> {
-    console.log('Deleting category with ID:', id, 'and Brand ID:', idBrand);
-    return this.categoriesService.deleteCategory(id, idBrand);
-  }
+  // @Delete(':id/brand/:idBrand')
+  // async deleteCategory(
+  //   @Param('id') id: number,
+  //   @Param('idBrand') idBrand: number,
+  // ): Promise<string> {
+  //   console.log('Deleting category with ID:', id, 'and Brand ID:', idBrand);
+  //   return this.categoriesService.deleteCategory(id, idBrand);
+  // }
 }

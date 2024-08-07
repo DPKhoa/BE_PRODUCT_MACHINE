@@ -7,6 +7,9 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
+  Res,
+  HttpStatus,
 } from '@nestjs/common';
 import { BrandService } from './brand.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
@@ -27,7 +30,7 @@ export class BrandController {
     return this.brandService.findAll();
   }
 
-  @Get(':id')
+  @Get('getBrandBy/:id')
   findOne(@Param('id') id: number) {
     return this.brandService.findOne(+id);
   }
@@ -40,8 +43,12 @@ export class BrandController {
     return this.brandService.updateBrand(+id, updateBrandDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.brandService.remove(+id);
+  @Delete('deleteBrand/:id')
+  async deleteBrand(
+    @Param('id', ParseIntPipe) id: number,
+    @Res() res,
+  ): Promise<void> {
+    const result = await this.brandService.deleteBrand(+id);
+    res.status(HttpStatus.OK).json(result);
   }
 }

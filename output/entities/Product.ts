@@ -10,7 +10,7 @@ import { Category } from './Category';
 @Entity('PRODUCT', { schema: 'dbo' })
 export class Product {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
-  id: string;
+  id: number;
 
   @Column('nvarchar', { name: 'name', nullable: true, length: 255 })
   name: string | null;

@@ -1,6 +1,10 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -108,18 +112,51 @@ export class ProductsService {
     console.log('result :>> ', result);
     return { products: result };
   }
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: number): Promise<Product> {
+    const product = await this.productResponsitory.findOne({
+      where: { id },
+      relations: ['category', 'category.brand'],
+    });
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+    return product;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async updateProduct(
+    id: number,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
+    const product = await this.productResponsitory.findOne({ where: { id } });
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+    Object.assign(product, updateProductDto);
+
+    return this.productResponsitory.save(product);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async deleteProduct(id: number): Promise<{ message: string }> {
+    const product = await this.productResponsitory.findOne({
+      where: { id },
+      relations: ['category'],
+    });
+    if (!product) {
+      throw new NotFoundException(`Product với ID ${id} không tìm thấy`);
+    }
+    const category = product.category;
+
+    await this.productResponsitory.remove(product);
+
+    if (category) {
+      const productsInCategory = await this.productResponsitory.find({
+        where: { category },
+      });
+      if (productsInCategory.length === 0) {
+        await this.categoryRepository.remove(category);
+      }
+    }
+
+    return { message: `Product với ID ${id} đã được xóa thành công` };
   }
-}
-function pickProductFields(product: Product): any {
-  throw new Error('Function not implemented.');
 }

@@ -1,4 +1,6 @@
 /* eslint-disable prettier/prettier */
+import { Category } from './../../output/entities/Category';
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
 import {
@@ -9,9 +11,9 @@ import {
 import CreateCategoryDto from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Category } from 'output/entities/Category';
 import { Repository } from 'typeorm';
 import { Brand } from 'output/entities/Brand';
+import { Product } from 'output/entities/Product';
 
 @Injectable()
 export class CategoriesService {
@@ -20,7 +22,10 @@ export class CategoriesService {
     private readonly categoryRespository: Repository<Category>,
     @InjectRepository(Brand)
     private readonly brandRepository: Repository<Brand>,
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
   ) {}
+
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
     const { idBrand, ...categoryDetails } = createCategoryDto;
     let brand = null;
@@ -28,7 +33,6 @@ export class CategoriesService {
       brand = await this.brandRepository.findOne({
         where: { id: idBrand },
       });
-
       if (!brand) {
         throw new BadRequestException(
           `Brand with ID ${idBrand} does not exist`,
@@ -37,7 +41,7 @@ export class CategoriesService {
     }
     const category = this.categoryRespository.create({
       ...categoryDetails,
-      brand,
+      brand: brand || null, // Gán brand nếu tồn tại, nếu không thì null
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -53,8 +57,12 @@ export class CategoriesService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  async findOne(id: number) {
+    const category = await this.categoryRespository.findOne({ where: { id } });
+    if (!category) {
+      throw new NotFoundException(`Category with ID ${id} nto found`);
+    }
+    return { category };
   }
 
   async updateCategory(id: number, updateCategoryDto: UpdateCategoryDto) {
@@ -67,13 +75,27 @@ export class CategoriesService {
     return this.categoryRespository.save(category);
   }
 
-  // async deleteCategory(id: number, idBrand: number): Promise<string> {
-  //   const result = await this.categoryRespository.delete({ id, idBrand });
-  //   if (result.affected === 0) {
-  //     throw new NotFoundException(
-  //       `Category with ID ${id} and Brand ID ${idBrand} not found`,
-  //     );
-  //   }
-  //   return `Category with ID ${id} successfully deleted`;
-  // }
+  async deleteCategory(id: number): Promise<{ message: string }> {
+    const category = await this.categoryRespository.findOne({
+      where: { id },
+      relations: ['products'],
+    });
+    if (!category) {
+      throw new NotFoundException(`Category with ID ${id} not found`);
+    }
+    if (category.products.length > 0) {
+      throw new BadRequestException(
+        `Cannot delete Category with ID ${id} because it is linked to one or more products`,
+      );
+    }
+
+    if (category.products.length > 0) {
+      throw new BadRequestException(
+        `Cannot delete Category with ID ${id} because it is linked to one or more products`,
+      );
+    }
+
+    await this.categoryRespository.remove(category);
+    return { message: `Category with ID ${id} successfully deleted` };
+  }
 }

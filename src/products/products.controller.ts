@@ -9,6 +9,7 @@ import {
   Delete,
   UsePipes,
   ValidationPipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -30,18 +31,21 @@ export class ProductsController {
     return this.productsService.getAllProducts();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productsService.findOne(+id);
+  @Get('getProductBy/:id')
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Product> {
+    return this.productsService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(+id, updateProductDto);
+  @Patch('updateProduct/:id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
+    return this.productsService.updateProduct(+id, updateProductDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productsService.remove(+id);
+  async deleteProduct(@Param('id', ParseIntPipe) id: number) {
+    return this.productsService.deleteProduct(id);
   }
 }

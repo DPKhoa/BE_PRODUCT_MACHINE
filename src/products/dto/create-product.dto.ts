@@ -28,14 +28,6 @@ export class CreateProductDto {
   @IsNumber()
   cost?: number;
 
-  @IsOptional()
-  @IsString()
-  event?: string;
-
-  @IsOptional()
-  @IsString()
-  discount?: string;
-
   @IsNotEmpty()
   @IsNumber()
   idCategory: number;

@@ -70,8 +70,6 @@ export class ProductsService {
         cost,
         createdAt,
         updatedAt,
-        event,
-        discount,
         category,
       } = product;
 
@@ -85,8 +83,6 @@ export class ProductsService {
         cost,
         createdAt,
         updatedAt,
-        event,
-        discount,
         category: category
           ? {
               id: category.id,

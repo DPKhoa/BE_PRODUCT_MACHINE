@@ -11,9 +11,6 @@ import { Product } from './Product';
 
 @Entity('CATEGORY', { schema: 'dbo' })
 export class Category {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
-  id: number;
-
   @Column('nvarchar', { name: 'name', nullable: true, length: 255 })
   name: string | null;
 
@@ -26,8 +23,11 @@ export class Category {
   @Column('datetime', { name: 'updated_at', nullable: true })
   updatedAt: Date | null;
 
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
+  id: number;
+
   @ManyToOne(() => Brand, (brand) => brand.categories)
-  @JoinColumn([{ name: 'id_brand', referencedColumnName: 'id' }])
+  @JoinColumn([{ name: 'brand', referencedColumnName: 'id' }])
   brand: Brand;
 
   @OneToMany(() => Product, (product) => product.category)

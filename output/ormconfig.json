@@ -7,7 +7,7 @@
     "username": "sa",
     "password": "123",
     "database": "",
-    "synchronize": true,
-    "entities": ["dist/**/*.entity{.ts,.js}"]
+    "synchronize": false,
+    "entities": ["entities/*.js"]
   }
 ]

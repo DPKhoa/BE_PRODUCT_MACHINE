@@ -1,5 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
+@Index('PK__sysdiagr__C2B05B6137E7E89D', ['diagramId'], { unique: true })
+@Index('UK_principal_name', ['principalId', 'name'], { unique: true })
 @Entity('sysdiagrams', { schema: 'dbo' })
 export class Sysdiagrams {
   @Column('nvarchar', { name: 'name', unique: true, length: 128 })

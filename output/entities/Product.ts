@@ -1,17 +1,21 @@
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ComboDetail } from './ComboDetail';
+import { ImgProduct } from './ImgProduct';
+import { Event } from './Event';
 import { Category } from './Category';
 
+@Index('PK__PRODUCT__3213E83F36F1B88B', ['id'], { unique: true })
+@Index('UQ__PRODUCT__3213E83E02537C78', ['id'], { unique: true })
 @Entity('PRODUCT', { schema: 'dbo' })
 export class Product {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
-  id: number;
-
   @Column('nvarchar', { name: 'name', nullable: true, length: 255 })
   name: string | null;
 
@@ -36,13 +40,20 @@ export class Product {
   @Column('datetime', { name: 'updated_at', nullable: true })
   updatedAt: Date | null;
 
-  @Column('nvarchar', { name: 'event', nullable: true, length: 255 })
-  event: string | null;
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
+  id: number;
 
-  @Column('nvarchar', { name: 'discount', nullable: true, length: 10 })
-  discount: string | null;
+  @OneToMany(() => ComboDetail, (comboDetail) => comboDetail.product2)
+  comboDetails: ComboDetail[];
+
+  @OneToMany(() => ImgProduct, (imgProduct) => imgProduct.product)
+  imgProducts: ImgProduct[];
+
+  @ManyToOne(() => Event, (event) => event.products)
+  @JoinColumn([{ name: 'event', referencedColumnName: 'id' }])
+  event: Event;
 
   @ManyToOne(() => Category, (category) => category.products)
-  @JoinColumn([{ name: 'id_category', referencedColumnName: 'id' }])
+  @JoinColumn([{ name: 'category', referencedColumnName: 'id' }])
   category: Category;
 }

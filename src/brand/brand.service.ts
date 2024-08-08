@@ -29,7 +29,7 @@ export class BrandService {
   async create(createBrandDto: CreateBrandDto): Promise<Brand> {
     const brand = this.brandRepository.create({
       ...createBrandDto,
-
+      
       createdAt: new Date(),
       updatedAt: new Date(),
     });

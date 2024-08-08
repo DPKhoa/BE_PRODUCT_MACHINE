@@ -3,9 +3,6 @@ import { Category } from './Category';
 
 @Entity('BRAND', { schema: 'dbo' })
 export class Brand {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
-  id: number;
-
   @Column('nvarchar', { name: 'name', nullable: true, length: 50 })
   name: string | null;
 
@@ -17,6 +14,9 @@ export class Brand {
 
   @Column('datetime', { name: 'updated_at', nullable: true })
   updatedAt: Date | null;
+
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
+  id: number;
 
   @OneToMany(() => Category, (category) => category.brand)
   categories: Category[];

@@ -25,7 +25,7 @@ export class ProductsService {
   ) {}
 
   async createProduct(createProductDto: CreateProductDto): Promise<Product> {
-    const { idCategory, idBrand, ...productDetails } = createProductDto;
+    const { idCategory, ...productDetails } = createProductDto;
 
     // Kiểm tra danh mục
     const category = await this.categoryRepository.findOne({
@@ -38,17 +38,13 @@ export class ProductsService {
         `Category with ID ${idCategory} does not exist`,
       );
     }
-    const brand = await this.brandRepository.findOne({
-      where: { id: idBrand },
-    });
 
-    if (!brand) {
-      throw new BadRequestException(`Brand with ID ${idBrand} does not exist`);
-    }
     // Tạo sản phẩm
     const product = this.productResponsitory.create({
       ...productDetails,
       category, // Set the category as an object
+      status:
+        productDetails.status !== undefined ? productDetails.status : true, // Default to true if not provided
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -60,9 +56,9 @@ export class ProductsService {
   }
   async getAllProducts(): Promise<{ products: any[] }> {
     const products = await this.productResponsitory.find({
+      where: { status: true },
       relations: ['category', 'category.brand'], // Load the related data
     });
-    console.log('Loaded products:', products); // Debugging log
     const pickProductFields = (product: Product) => {
       const {
         id,
@@ -109,28 +105,53 @@ export class ProductsService {
     };
 
     const result = products.map(pickProductFields);
-    console.log('result :>> ', result);
+
     return { products: result };
   }
   async findOne(id: number): Promise<Product> {
     const product = await this.productResponsitory.findOne({
-      where: { id },
+      where: { id, status: true },
       relations: ['category', 'category.brand'],
     });
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
-    return product;
+    return {
+      ...product,
+      category: product.category
+        ? {
+            ...product.category,
+          }
+        : null,
+    };
   }
 
   async updateProduct(
     id: number,
     updateProductDto: UpdateProductDto,
   ): Promise<Product> {
-    const product = await this.productResponsitory.findOne({ where: { id } });
+    const { idCategory, ...productDetails } = updateProductDto;
+
+    //Kiểm tra Product có tồn tại hay không?
+    const product = await this.productResponsitory.findOne({
+      where: { id, status: true },
+    });
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
+    // Kiểm tra xem Category mới có tồn tại không
+    if (idCategory) {
+      const category = await this.categoryRepository.findOne({
+        where: { id: idCategory },
+      });
+      if (!category) {
+        throw new BadRequestException(
+          `Category with ID ${idCategory} does not exist`,
+        );
+      }
+      product.category = category;
+    }
+    //Cập nhật Product
     Object.assign(product, updateProductDto);
 
     return this.productResponsitory.save(product);
@@ -138,7 +159,7 @@ export class ProductsService {
 
   async deleteProduct(id: number): Promise<{ message: string }> {
     const product = await this.productResponsitory.findOne({
-      where: { id },
+      where: { id, status: true },
       relations: ['category'],
     });
     if (!product) {

@@ -29,6 +29,7 @@ export class BrandService {
   async create(createBrandDto: CreateBrandDto): Promise<Brand> {
     const brand = this.brandRepository.create({
       ...createBrandDto,
+
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -42,12 +43,12 @@ export class BrandService {
   }
 
   //GetBrandById
-  async findOne(id: number) {
+  async findOne(id: number): Promise<Brand> {
     const brand = await this.brandRepository.findOne({ where: { id } });
     if (!brand) {
       throw new NotFoundException(`Brand with ID ${id} not found`);
     }
-    return { brand };
+    return brand;
   }
 
   async updateBrand(id: number, updateBrandDto: UpdateBrandDto) {
@@ -71,12 +72,12 @@ export class BrandService {
     const relatedCategories = await this.categoryRepository.find({
       where: { brand: { id } },
     });
-
     if (relatedCategories.length > 0) {
       throw new BadRequestException(
         `Cannot delete Brand with ID ${id} because it is linked to one or more categories`,
       );
     }
+    //Kiểm tra brand có tồn tại trong Product không
     const productCount = await this.productRepository
       .createQueryBuilder('product')
       .innerJoin('product.category', 'category')
@@ -95,13 +96,13 @@ export class BrandService {
     }
 
     // Cập nhật ID của các Brand còn lại
-    await this.brandRepository.query(
-      `UPDATE "brand" SET "id"= "id"-1 WHERE "id"> $1`,
-      [id],
-    );
-    await this.brandRepository.query(
-      `ALTER SEQUENCE brand_id_seq RESTART WITH(SELECT MAX(id)+1 FROM "brand");`,
-    );
+    // await this.brandRepository.query(
+    //   `UPDATE "brand" SET "id"= "id"-1 WHERE "id"> $1`,
+    //   [id],
+    // );
+    // await this.brandRepository.query(
+    //   `ALTER SEQUENCE brand_id_seq RESTART WITH(SELECT MAX(id)+1 FROM "brand");`,
+    // );
     return { message: `Brand with ID ${id} has been successfully removed` };
   }
 }

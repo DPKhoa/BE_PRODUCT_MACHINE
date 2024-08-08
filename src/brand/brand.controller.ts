@@ -21,8 +21,8 @@ export class BrandController {
   constructor(private readonly brandService: BrandService) {}
 
   @Post('createBrand')
-  create(@Body() createBrandDto: CreateBrandDto): Promise<Brand> {
-    return this.brandService.create(createBrandDto);
+  async create(@Body() createBrandDto: CreateBrandDto): Promise<Brand> {
+    return await this.brandService.create(createBrandDto);
   }
 
   @Get('/getAllBrand')

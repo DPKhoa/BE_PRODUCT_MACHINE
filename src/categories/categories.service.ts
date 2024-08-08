@@ -42,6 +42,8 @@ export class CategoriesService {
     const category = this.categoryRespository.create({
       ...categoryDetails,
       brand: brand || null, // Gán brand nếu tồn tại, nếu không thì null
+      status:
+        categoryDetails.status !== undefined ? categoryDetails.status : true,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -50,7 +52,9 @@ export class CategoriesService {
 
   async findAll(): Promise<{ categories: Category[] }> {
     try {
-      const categories = await this.categoryRespository.find();
+      const categories = await this.categoryRespository.find({
+        where: { status: true },
+      });
       return { categories };
     } catch (error) {
       throw new Error('Failed to retrieve categories');
@@ -58,7 +62,9 @@ export class CategoriesService {
   }
 
   async findOne(id: number) {
-    const category = await this.categoryRespository.findOne({ where: { id } });
+    const category = await this.categoryRespository.findOne({
+      where: { id, status: true },
+    });
     if (!category) {
       throw new NotFoundException(`Category with ID ${id} nto found`);
     }
@@ -66,35 +72,66 @@ export class CategoriesService {
   }
 
   async updateCategory(id: number, updateCategoryDto: UpdateCategoryDto) {
-    const category = await this.categoryRespository.findOne({ where: { id } });
+    const category = await this.categoryRespository.findOne({
+      where: { id, status: true },
+      relations: ['brand'],
+    });
     if (!category) {
       throw new NotFoundException(`Category with ID ${id} nto found`);
     }
+
+    // Kiểm tra nếu category đã có brand thì không thể cập nhật brand
+
+    if (
+      category.brand &&
+      updateCategoryDto.idBrand &&
+      category.brand.id !== updateCategoryDto.idBrand
+    ) {
+      throw new BadRequestException(
+        `Category with ID ${id} already has a brand and cannot be updated`,
+      );
+    }
+    // Cập nhật brand nếu category chưa có brand
+    if (!category.brand && updateCategoryDto.idBrand) {
+      const brand = await this.brandRepository.findOne({
+        where: { id: updateCategoryDto.idBrand },
+      });
+      if (!brand) {
+        throw new BadRequestException(
+          `Brand with ID ${updateCategoryDto.idBrand} does not exist`,
+        );
+      }
+      category.brand = brand;
+    }
     category.updatedAt = new Date();
+    // Cập nhật các thuộc tính của category
     Object.assign(category, updateCategoryDto);
+
     return this.categoryRespository.save(category);
   }
 
   async deleteCategory(id: number): Promise<{ message: string }> {
     const category = await this.categoryRespository.findOne({
-      where: { id },
-      relations: ['products'],
+      where: { id, status: true },
     });
     if (!category) {
       throw new NotFoundException(`Category with ID ${id} not found`);
     }
-    if (category.products.length > 0) {
-      throw new BadRequestException(
-        `Cannot delete Category with ID ${id} because it is linked to one or more products`,
+
+    // Tìm các Product liên kết với Category
+    const relatedProducts = await this.productRepository.find({
+      where: { category: { id } },
+    });
+
+    if (relatedProducts.length > 0) {
+      // Xóa các Product liên kết
+      await this.productRepository.update(
+        { category: { id } },
+        { category: null }, // Hoặc gán một Category khác nếu cần
       );
     }
 
-    if (category.products.length > 0) {
-      throw new BadRequestException(
-        `Cannot delete Category with ID ${id} because it is linked to one or more products`,
-      );
-    }
-
+    //Xóa Category
     await this.categoryRespository.remove(category);
     return { message: `Category with ID ${id} successfully deleted` };
   }

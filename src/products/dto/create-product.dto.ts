@@ -14,7 +14,7 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsString()
-  description?: string;
+  descrption?: string;
 
   @IsOptional()
   @IsNumber()
@@ -39,8 +39,4 @@ export class CreateProductDto {
   @IsNotEmpty()
   @IsNumber()
   idCategory: number;
-  
-  @IsNotEmpty()
-  @IsNumber()
-  idBrand: number;
 }

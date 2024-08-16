@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+/* eslint-disable prettier/prettier */
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ComboDetailService } from './combo_detail.service';
 import { CreateComboDetailDto } from './dto/create-combo_detail.dto';
 import { UpdateComboDetailDto } from './dto/update-combo_detail.dto';
@@ -23,7 +32,10 @@ export class ComboDetailController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateComboDetailDto: UpdateComboDetailDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateComboDetailDto: UpdateComboDetailDto,
+  ) {
     return this.comboDetailService.update(+id, updateComboDetailDto);
   }
 

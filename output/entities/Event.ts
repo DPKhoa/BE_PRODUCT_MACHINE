@@ -11,8 +11,8 @@ import { Product } from './Product';
 @Index('UQ__EVENT__3213E83E05D83904', ['id'], { unique: true })
 @Entity('EVENT', { schema: 'dbo' })
 export class Event {
-  @Column('nchar', { name: 'discount', nullable: true, length: 10 })
-  discount: string | null;
+  @Column('int', { name: 'discount', nullable: true })
+  discount: number | null;
 
   @Column('nvarchar', { name: 'name', nullable: true, length: 255 })
   name: string | null;
@@ -26,8 +26,8 @@ export class Event {
   @Column('int', { name: 'price', nullable: true })
   price: number | null;
 
-  @Column('char', { name: 'status', nullable: true, length: 10 })
-  status: string | null;
+  @Column('bit', { name: 'status', nullable: true })
+  status: boolean | null;
 
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;

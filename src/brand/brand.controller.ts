@@ -25,7 +25,7 @@ export class BrandController {
     return await this.brandService.create(createBrandDto);
   }
 
-  @Get('/getAllBrand')
+  @Get('getAllBrand')
   async findAll(): Promise<{ brands: Brand[] }> {
     return this.brandService.findAll();
   }

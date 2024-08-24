@@ -29,7 +29,7 @@ export class ProductsService {
 
     // Kiểm tra danh mục
     const category = await this.categoryRepository.findOne({
-      where: { id: idCategory },
+      where: { categoryId: idCategory },
       relations: ['brand'], // Ensure brand is loaded
     });
 
@@ -61,7 +61,7 @@ export class ProductsService {
     });
     const pickProductFields = (product: Product) => {
       const {
-        id,
+        productId,
         name,
         descrption,
         price,
@@ -74,7 +74,7 @@ export class ProductsService {
       } = product;
 
       return {
-        id,
+        productId,
         name,
         descrption,
         price,
@@ -85,16 +85,16 @@ export class ProductsService {
         updatedAt,
         category: category
           ? {
-              id: category.id,
+              id: category.products,
               name: category.name,
               status: category.status,
             }
           : null,
-        brand: product.category?.brand
+        brand: product.brand
           ? {
-              id: product.category.brand.id,
-              name: product.category.brand.name,
-              image: product.category.brand.image,
+              id: product.brand.brandId,
+              name: product.brand.name,
+              image: product.brand.image,
             }
           : null,
       };
@@ -155,7 +155,7 @@ export class ProductsService {
 
   async deleteProduct(id: number): Promise<{ message: string }> {
     const product = await this.productResponsitory.findOne({
-      where: { id, status: true },
+      where: { productId, status: true },
       relations: ['category'],
     });
     if (!product) {

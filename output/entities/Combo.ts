@@ -1,17 +1,12 @@
-import {
-  Column,
-  Entity,
-  Index,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { ComboDetail } from './ComboDetail';
+import { Column, Entity, Index, ManyToMany } from 'typeorm';
+import { Product } from './Product';
 
-@Index('UQ__COMBO__3213E83E2B05189F', ['id'], { unique: true })
+@Index('PK__COMBO__18F74AA33F9B1D58', ['comboId'], { unique: true })
+@Index('UQ__COMBO__18F74AA2E48CA591', ['comboId'], { unique: true })
 @Entity('COMBO', { schema: 'dbo' })
 export class Combo {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
-  id: number;
+  @Column('int', { primary: true, name: 'combo_id' })
+  comboId: number;
 
   @Column('int', { name: 'cost', nullable: true })
   cost: number | null;
@@ -31,6 +26,9 @@ export class Combo {
   @Column('bit', { name: 'status', nullable: true })
   status: boolean | null;
 
-  @OneToMany(() => ComboDetail, (comboDetail) => comboDetail.combo2)
-  comboDetails: ComboDetail[];
+  @Column('int', { name: 'product_number', nullable: true })
+  productNumber: number | null;
+
+  @ManyToMany(() => Product, (product) => product.combos)
+  products: Product[];
 }

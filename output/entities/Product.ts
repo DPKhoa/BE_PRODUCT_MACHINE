@@ -3,19 +3,26 @@ import {
   Entity,
   Index,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
-  PrimaryGeneratedColumn,
 } from 'typeorm';
-import { ComboDetail } from './ComboDetail';
-import { ImgProduct } from './ImgProduct';
+import { Combo } from './Combo';
 import { Event } from './Event';
+import { GoodsDetail } from './GoodsDetail';
+import { ImgProduct } from './ImgProduct';
+import { OrderDetail } from './OrderDetail';
+import { Brand } from './Brand';
 import { Category } from './Category';
 
-@Index('PK__PRODUCT__3213E83F36F1B88B', ['id'], { unique: true })
-@Index('UQ__PRODUCT__3213E83E02537C78', ['id'], { unique: true })
+@Index('PK__PRODUCT__47027DF5A155EDE0', ['productId'], { unique: true })
+@Index('UQ__PRODUCT__47027DF48D96652A', ['productId'], { unique: true })
 @Entity('PRODUCT', { schema: 'dbo' })
 export class Product {
+  @Column('int', { primary: true, name: 'product_id' })
+  productId: number;
+
   @Column('nvarchar', { name: 'name', nullable: true, length: 255 })
   name: string | null;
 
@@ -40,20 +47,41 @@ export class Product {
   @Column('datetime', { name: 'updated_at', nullable: true })
   updatedAt: Date | null;
 
-  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
-  id: number;
+  @Column('nvarchar', { name: 'guarantee', nullable: true, length: 10 })
+  guarantee: string | null;
 
-  @OneToMany(() => ComboDetail, (comboDetail) => comboDetail.product2)
-  comboDetails: ComboDetail[];
+  @ManyToMany(() => Combo, (combo) => combo.products)
+  @JoinTable({
+    name: 'COMBO_DETAIL',
+    joinColumns: [{ name: 'product', referencedColumnName: 'productId' }],
+    inverseJoinColumns: [{ name: 'combo', referencedColumnName: 'comboId' }],
+    schema: 'dbo',
+  })
+  combos: Combo[];
+
+  @ManyToMany(() => Event, (event) => event.products)
+  @JoinTable({
+    name: 'EVENT_DETAIL',
+    joinColumns: [{ name: 'product_id', referencedColumnName: 'productId' }],
+    inverseJoinColumns: [{ name: 'event_id', referencedColumnName: 'eventId' }],
+    schema: 'dbo',
+  })
+  events: Event[];
+
+  @OneToMany(() => GoodsDetail, (goodsDetail) => goodsDetail.product)
+  goodsDetails: GoodsDetail[];
 
   @OneToMany(() => ImgProduct, (imgProduct) => imgProduct.product)
   imgProducts: ImgProduct[];
 
-  @ManyToOne(() => Event, (event) => event.products)
-  @JoinColumn([{ name: 'event', referencedColumnName: 'id' }])
-  event: Event;
+  @OneToMany(() => OrderDetail, (orderDetail) => orderDetail.product)
+  orderDetails: OrderDetail[];
+
+  @ManyToOne(() => Brand, (brand) => brand.products)
+  @JoinColumn([{ name: 'brand_id', referencedColumnName: 'brandId' }])
+  brand: Brand;
 
   @ManyToOne(() => Category, (category) => category.products)
-  @JoinColumn([{ name: 'category', referencedColumnName: 'id' }])
+  @JoinColumn([{ name: 'category', referencedColumnName: 'categoryId' }])
   category: Category;
 }

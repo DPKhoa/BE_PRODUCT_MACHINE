@@ -1,8 +1,13 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Category } from './Category';
+import { Column, Entity, Index, OneToMany } from 'typeorm';
+import { Product } from './Product';
 
+@Index('PK__BRAND__5E5A8E27CB63E031', ['brandId'], { unique: true })
+@Index('UQ__BRAND__5E5A8E26FE4A37DF', ['brandId'], { unique: true })
 @Entity('BRAND', { schema: 'dbo' })
 export class Brand {
+  @Column('int', { primary: true, name: 'brand_id' })
+  brandId: number;
+
   @Column('nvarchar', { name: 'name', nullable: true, length: 50 })
   name: string | null;
 
@@ -15,9 +20,6 @@ export class Brand {
   @Column('datetime', { name: 'updated_at', nullable: true })
   updatedAt: Date | null;
 
-  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
-  id: number;
-
-  @OneToMany(() => Category, (category) => category.brand)
-  categories: Category[];
+  @OneToMany(() => Product, (product) => product.brand)
+  products: Product[];
 }

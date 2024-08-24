@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Fast food API')
+    .setTitle('machine')
     .setDescription('The description of the API')
     .setVersion('1.0')
     .build();

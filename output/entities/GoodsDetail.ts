@@ -1,10 +1,7 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Product } from './Product';
 import { Goods } from './Goods';
 
-@Index('PK__GOODS_DE__C309DFD63B066A8D', ['productId', 'goodsId'], {
-  unique: true,
-})
 @Entity('GOODS_DETAIL', { schema: 'dbo' })
 export class GoodsDetail {
   @Column('int', { primary: true, name: 'product_id' })

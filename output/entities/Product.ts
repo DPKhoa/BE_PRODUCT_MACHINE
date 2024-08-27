@@ -16,7 +16,6 @@ import { OrderDetail } from './OrderDetail';
 import { Brand } from './Brand';
 import { Category } from './Category';
 
-@Index('PK__PRODUCT__47027DF5A155EDE0', ['productId'], { unique: true })
 @Index('UQ__PRODUCT__47027DF48D96652A', ['productId'], { unique: true })
 @Entity('PRODUCT', { schema: 'dbo' })
 export class Product {

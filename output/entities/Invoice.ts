@@ -1,9 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { Order } from './Order';
 
-@Index('PK__INVOICE__71E86B6BF465F8D1', ['invoiceId', 'orderId'], {
-  unique: true,
-})
 @Index('UQ__INVOICE__F58DFD48C2068EEB', ['invoiceId'], { unique: true })
 @Entity('INVOICE', { schema: 'dbo' })
 export class Invoice {

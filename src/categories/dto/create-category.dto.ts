@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import {
   IsBoolean,
-  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -18,8 +17,4 @@ export default class CreateCategoryDto {
   @IsOptional()
   @IsBoolean()
   status?: boolean;
-
-  @IsNotEmpty()
-  @IsInt()
-  idBrand?: number;
 }

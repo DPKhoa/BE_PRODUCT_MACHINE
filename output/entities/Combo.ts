@@ -1,7 +1,6 @@
 import { Column, Entity, Index, ManyToMany } from 'typeorm';
 import { Product } from './Product';
 
-@Index('PK__COMBO__18F74AA33F9B1D58', ['comboId'], { unique: true })
 @Index('UQ__COMBO__18F74AA2E48CA591', ['comboId'], { unique: true })
 @Entity('COMBO', { schema: 'dbo' })
 export class Combo {

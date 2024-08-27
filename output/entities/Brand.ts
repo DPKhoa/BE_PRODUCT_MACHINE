@@ -1,7 +1,6 @@
 import { Column, Entity, Index, OneToMany } from 'typeorm';
 import { Product } from './Product';
 
-@Index('PK__BRAND__5E5A8E27CB63E031', ['brandId'], { unique: true })
 @Index('UQ__BRAND__5E5A8E26FE4A37DF', ['brandId'], { unique: true })
 @Entity('BRAND', { schema: 'dbo' })
 export class Brand {

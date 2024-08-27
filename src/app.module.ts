@@ -11,6 +11,11 @@ import { EventsModule } from './events/events.module';
 import { ImgProductModule } from './img_product/img_product.module';
 import { ComboModule } from './combo/combo.module';
 import { ComboDetailModule } from './combo_detail/combo_detail.module';
+import { GoodsModule } from './goods/goods.module';
+import { GoodsDetailModule } from './goods-detail/goods-detail.module';
+import { OrderModule } from './order/order.module';
+import { OrderDetailsModule } from './order-details/order-details.module';
+import { InvoicesModule } from './invoices/invoices.module';
 
 import config from '../ormconfig';
 
@@ -24,6 +29,11 @@ import config from '../ormconfig';
     ImgProductModule,
     ComboModule,
     ComboDetailModule,
+    GoodsModule,
+    GoodsDetailModule,
+    OrderModule,
+    OrderDetailsModule,
+    InvoicesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

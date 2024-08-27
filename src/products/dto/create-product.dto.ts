@@ -30,5 +30,9 @@ export class CreateProductDto {
 
   @IsNotEmpty()
   @IsNumber()
-  idCategory: number;
+  brandId: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  categoryId: number;
 }

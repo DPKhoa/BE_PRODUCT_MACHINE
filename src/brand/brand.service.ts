@@ -34,9 +34,19 @@ export class BrandService {
   }
 
   //GetAllBrand
-  async findAll(): Promise<{ brands: Brand[] }> {
+  async findAll(): Promise<{
+    status: string;
+    code: number;
+    message: string;
+    data: Brand[];
+  }> {
     const brands = await this.brandRepository.find();
-    return { brands };
+    return {
+      status: 'success',
+      code: 200,
+      message: 'get all brand successfully',
+      data: brands,
+    };
   }
 
   //GetBrandById

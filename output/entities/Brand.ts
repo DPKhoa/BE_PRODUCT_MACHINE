@@ -1,10 +1,16 @@
-import { Column, Entity, Index, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Product } from './Product';
 
 @Index('UQ__BRAND__5E5A8E26FE4A37DF', ['brandId'], { unique: true })
 @Entity('BRAND', { schema: 'dbo' })
 export class Brand {
-  @Column('int', { primary: true, name: 'brand_id' })
+  @PrimaryGeneratedColumn({ type: 'int', name: 'brand_id' })
   brandId: number;
 
   @Column('nvarchar', { name: 'name', nullable: true, length: 50 })

@@ -7,6 +7,7 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Combo } from './Combo';
 import { Event } from './Event';
@@ -19,7 +20,7 @@ import { Category } from './Category';
 @Index('UQ__PRODUCT__47027DF48D96652A', ['productId'], { unique: true })
 @Entity('PRODUCT', { schema: 'dbo' })
 export class Product {
-  @Column('int', { primary: true, name: 'product_id' })
+  @PrimaryGeneratedColumn({ type: 'int', name: 'product_id' })
   productId: number;
 
   @Column('nvarchar', { name: 'name', nullable: true, length: 255 })

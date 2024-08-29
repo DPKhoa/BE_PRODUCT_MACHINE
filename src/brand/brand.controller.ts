@@ -26,8 +26,14 @@ export class BrandController {
   }
 
   @Get('getAllBrand')
-  async findAll(): Promise<{ brands: Brand[] }> {
-    return this.brandService.findAll();
+  async findAll() {
+    const result = await this.brandService.findAll();
+    return {
+      status: result.status,
+      message: result.message,
+      code: HttpStatus.OK,
+      data: result.data,
+    };
   }
 
   @Get('getBrandBy/:id')

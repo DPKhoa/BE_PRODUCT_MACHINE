@@ -39,12 +39,22 @@ export class CategoriesService {
     return this.categoryRespository.save(category);
   }
 
-  async findAll(): Promise<{ categories: Category[] }> {
+  async findAll(): Promise<{
+    status: string;
+    code: number;
+    message: string;
+    data: Category[];
+  }> {
     try {
       const categories = await this.categoryRespository.find({
         where: { status: true },
       });
-      return { categories };
+      return {
+        status: 'success',
+        code: 200,
+        message: 'get all categories successfully',
+        data: categories,
+      };
     } catch (error) {
       throw new Error('Failed to retrieve categories');
     }
@@ -65,7 +75,7 @@ export class CategoriesService {
     updateCategoryDto: UpdateCategoryDto,
   ) {
     const category = await this.categoryRespository.findOne({
-      where: { categoryId, status: true },
+      where: { categoryId },
     });
     if (!category) {
       throw new NotFoundException(`Category with ID ${categoryId} nto found`);

@@ -27,8 +27,19 @@ export class ProductsController {
   }
 
   @Get('getAllProduct')
-  async findAll(): Promise<{ products: Product[] }> {
-    return this.productsService.getAllProducts();
+  async getAllProducts(): Promise<{
+    status: string;
+    code: number;
+    message: string;
+    data: any[];
+  }> {
+    const result = await this.productsService.getAllProducts();
+    return {
+      status: 'success',
+      code: 200,
+      message: 'Get all products successfully',
+      data: result.products,
+    };
   }
 
   @Get('getProductBy/:id')

@@ -1,10 +1,16 @@
-import { Column, Entity, Index, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Product } from './Product';
 
 @Index('UQ__CATEGORY__D54EE9B5CB93795A', ['categoryId'], { unique: true })
 @Entity('CATEGORY', { schema: 'dbo' })
 export class Category {
-  @Column('int', { primary: true, name: 'category_id' })
+  @PrimaryGeneratedColumn({ type: 'int', name: 'category_id' })
   categoryId: number;
 
   @Column('nvarchar', { name: 'name', nullable: true, length: 255 })

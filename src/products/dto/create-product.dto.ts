@@ -28,6 +28,10 @@ export class CreateProductDto {
   @IsNumber()
   cost?: number;
 
+  @IsOptional()
+  @IsString()
+  guarantee: string;
+
   @IsNotEmpty()
   @IsNumber()
   brandId: number;

@@ -14,7 +14,6 @@ import {
 import { CategoriesService } from './categories.service';
 import CreateCategoryDto from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Category } from 'output/entities/Category';
 
 @Controller('categories')
 export class CategoriesController {
@@ -26,8 +25,13 @@ export class CategoriesController {
   }
 
   @Get('getAllCategory')
-  async findAll(): Promise<{ categories: Category[] }> {
-    return this.categoriesService.findAll();
+  async findAll() {
+    const result = await this.categoriesService.findAll();
+    return {
+      status: HttpStatus.OK,
+      message: result.message,
+      data: result.data,
+    };
   }
 
   @Get(':id')

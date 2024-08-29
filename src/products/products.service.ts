@@ -49,6 +49,7 @@ export class ProductsService {
     const product = this.productResponsitory.create({
       ...productDetails,
       category, // Set the category as an object
+      brand,
       status:
         productDetails.status !== undefined ? productDetails.status : true, // Default to true if not provided
       createdAt: new Date(),
@@ -77,6 +78,7 @@ export class ProductsService {
         createdAt,
         updatedAt,
         category,
+        brand,
       } = product;
 
       return {
@@ -91,16 +93,16 @@ export class ProductsService {
         updatedAt,
         category: category
           ? {
-              id: category.products,
+              id: category.categoryId,
               name: category.name,
               status: category.status,
             }
           : null,
-        brand: product.brand
+        brand: brand
           ? {
-              id: product.brand.brandId,
-              name: product.brand.name,
-              image: product.brand.image,
+              id: brand.brandId,
+              name: brand.name,
+              image: brand.image,
             }
           : null,
       };
@@ -108,7 +110,9 @@ export class ProductsService {
 
     const result = products.map(pickProductFields);
 
-    return { products: result };
+    return {
+      products: result,
+    };
   }
   async findOne(productId: number): Promise<Product> {
     const product = await this.productResponsitory.findOne({

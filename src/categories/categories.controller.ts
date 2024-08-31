@@ -30,12 +30,12 @@ export class CategoriesController {
     try {
       const result = await this.categoriesService.findAll();
       if (!result || result.length === 0) {
-        throw new BadRequestException('No brands found');
+        throw new BadRequestException('No categories found');
       }
       return {
         status: 'success',
         code: 200,
-        message: 'All brands retrieved successfully',
+        message: 'All categories retrieved successfully',
         data: result,
       };
     } catch (error) {

@@ -1,14 +1,20 @@
-import { Column, Entity, Index, ManyToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Product } from './Product';
 
 @Index('UQ__EVENT__2370F7268B1993F5', ['eventId'], { unique: true })
 @Entity('EVENT', { schema: 'dbo' })
 export class Event {
-  @Column('int', { primary: true, name: 'event_id' })
+  @PrimaryGeneratedColumn({ type: 'int', name: 'event_id' })
   eventId: number;
 
-  @Column('nchar', { name: 'discount', nullable: true, length: 10 })
-  discount: string | null;
+  @Column('int', { name: 'discount', nullable: true })
+  discount: number | null;
 
   @Column('nvarchar', { name: 'name', nullable: true, length: 255 })
   name: string | null;
@@ -22,8 +28,8 @@ export class Event {
   @Column('int', { name: 'price', nullable: true })
   price: number | null;
 
-  @Column('char', { name: 'status', nullable: true, length: 10 })
-  status: string | null;
+  @Column('bit', { name: 'status', nullable: true })
+  status: boolean; // Ensure this matches your DTO
 
   @ManyToMany(() => Product, (product) => product.events)
   products: Product[];

@@ -38,7 +38,7 @@ export class BrandService {
     try {
       // console.log('Attempting to fetch all brands...');
       const brands = await this.brandRepository.find();
-      // console.log('Brands retrieved:', brands);
+      console.log('Brands retrieved:', brands);
       if (!brands || brands.length === 0) {
         // console.log('No brands found.');
         return [];

@@ -10,11 +10,11 @@ import {
   ParseIntPipe,
   Res,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
-import { Event } from 'output/entities/Event';
 
 @Controller('events')
 export class EventsController {
@@ -22,12 +22,38 @@ export class EventsController {
 
   @Post('createEvent')
   async create(@Body() createEventDto: CreateEventDto) {
-    return this.eventsService.createEvent(createEventDto);
+    try {
+      return {
+        status: 'success',
+        data: await this.eventsService.createEvent(createEventDto),
+      };
+    } catch (error) {
+      throw new BadRequestException('Validation failed');
+    }
   }
 
   @Get('getAllEvent')
-  async findAll(): Promise<Event[]> {
-    return this.eventsService.findAll();
+  async findAll() {
+    try {
+      const events = await this.eventsService.findAll();
+      if (!events || events.length === 0) {
+        throw new BadRequestException('No events found');
+      }
+      return {
+        status: 'success',
+        code: 200,
+        message: 'All events retrieved successfully',
+        data: events,
+      };
+    } catch (error) {
+      throw (
+        (new BadRequestException('Something bad happened'),
+        {
+          cause: new Error(),
+          description: 'Some error description',
+        })
+      );
+    }
   }
 
   @Get('getEventBy/:id')

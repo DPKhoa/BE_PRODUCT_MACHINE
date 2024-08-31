@@ -48,6 +48,7 @@ export class CategoriesService {
         // console.log('No brands found.');
         return [];
       }
+      console.log('categories :>> ', categories);
       return categories;
     } catch (error) {
       throw new Error('Failed to retrieve categories');

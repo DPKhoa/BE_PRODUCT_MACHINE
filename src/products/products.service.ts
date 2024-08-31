@@ -112,6 +112,7 @@ export class ProductsService {
       };
 
       const result = products.map(pickProductFields);
+      console.log('result :>> ', result);
 
       return { products: result };
     } catch (error) {

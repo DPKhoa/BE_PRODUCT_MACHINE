@@ -10,6 +10,7 @@ import {
   UsePipes,
   ValidationPipe,
   ParseIntPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -26,20 +27,24 @@ export class ProductsController {
     return this.productsService.createProduct(createProductDto);
   }
 
-  @Get('getAllProduct')
-  async getAllProducts(): Promise<{
-    status: string;
-    code: number;
-    message: string;
-    data: any[];
-  }> {
-    const result = await this.productsService.getAllProducts();
-    return {
-      status: 'success',
-      code: 200,
-      message: 'Get all products successfully',
-      data: result.products,
-    };
+  @Get('getAllProducts')
+  async findAllProducts() {
+    try {
+      const result = await this.productsService.getAllProducts();
+      return {
+        status: 'success',
+        code: 200,
+        message: 'All products retrieved successfully',
+        data: result.products, // Use ProductResponseDto[] here
+      };
+    } catch (error) {
+      throw new BadRequestException({
+        status: 'error',
+        code: 400,
+        message: 'Failed to retrieve products',
+        description: error.message,
+      });
+    }
   }
 
   @Get('getProductBy/:id')

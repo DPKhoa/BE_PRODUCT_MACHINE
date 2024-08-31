@@ -1,4 +1,6 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable prettier/prettier */
 import {
   Controller,
   Get,
@@ -10,6 +12,7 @@ import {
   ParseIntPipe,
   Res,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { BrandService } from './brand.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
@@ -27,15 +30,24 @@ export class BrandController {
 
   @Get('getAllBrand')
   async findAll() {
-    const result = await this.brandService.findAll();
-    return {
-      status: result.status,
-      message: result.message,
-      code: HttpStatus.OK,
-      data: result.data,
-    };
+    try {
+      const result = await this.brandService.findAll();
+      if (!result || result.length === 0) {
+        throw new BadRequestException('No brands found');
+      }
+      return {
+        status: 'success',
+        code: 200,
+        message: 'All brands retrieved successfully',
+        data: result,
+      };
+    } catch (error) {
+      throw new BadRequestException('Something bad happened', {
+        cause: new Error(),
+        description: 'Some error description ',
+      });
+    }
   }
-
   @Get('getBrandBy/:id')
   findOne(@Param('id') id: number) {
     return this.brandService.findOne(+id);

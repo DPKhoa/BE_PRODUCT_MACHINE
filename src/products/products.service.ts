@@ -12,6 +12,7 @@ import { Product } from 'output/entities/Product';
 import { Repository } from 'typeorm';
 import { Brand } from 'output/entities/Brand';
 import { Category } from 'output/entities/Category';
+import { ProductResponseDto } from './dto/product-respone.dto';
 
 @Injectable()
 export class ProductsService {
@@ -61,58 +62,61 @@ export class ProductsService {
 
     return savedProduct;
   }
-  async getAllProducts(): Promise<{ products: any[] }> {
-    const products = await this.productResponsitory.find({
-      where: { status: true },
-      relations: ['category', 'brand'], // Load the related data
-    });
-    const pickProductFields = (product: Product) => {
-      const {
-        productId,
-        name,
-        descrption,
-        price,
-        quantity,
-        status,
-        cost,
-        createdAt,
-        updatedAt,
-        category,
-        brand,
-      } = product;
+  async getAllProducts(): Promise<{ products: ProductResponseDto[] }> {
+    try {
+      const products = await this.productResponsitory.find({
+        where: { status: true },
+        relations: ['category', 'brand'], // Load the related data
+      });
 
-      return {
-        productId,
-        name,
-        descrption,
-        price,
-        quantity,
-        status,
-        cost,
-        createdAt,
-        updatedAt,
-        category: category
-          ? {
-              id: category.categoryId,
-              name: category.name,
-              status: category.status,
-            }
-          : null,
-        brand: brand
-          ? {
-              id: brand.brandId,
-              name: brand.name,
-              image: brand.image,
-            }
-          : null,
+      const pickProductFields = (product: Product): ProductResponseDto => {
+        const {
+          productId,
+          name,
+          descrption,
+          price,
+          quantity,
+          status,
+          cost,
+          createdAt,
+          updatedAt,
+          category,
+          brand,
+        } = product;
+
+        return {
+          productId,
+          name,
+          descrption,
+          price,
+          quantity,
+          status,
+          cost,
+          createdAt,
+          updatedAt,
+          category: category
+            ? {
+                id: category.categoryId,
+                name: category.name,
+                status: category.status,
+              }
+            : null,
+          brand: brand
+            ? {
+                id: brand.brandId,
+                name: brand.name,
+                image: brand.image,
+              }
+            : null,
+        };
       };
-    };
 
-    const result = products.map(pickProductFields);
+      const result = products.map(pickProductFields);
 
-    return {
-      products: result,
-    };
+      return { products: result };
+    } catch (error) {
+      throw new Error('Failed to retrieve products');
+    }
   }
   async findOne(productId: number): Promise<Product> {
     const product = await this.productResponsitory.findOne({

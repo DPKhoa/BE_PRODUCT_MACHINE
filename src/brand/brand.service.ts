@@ -34,19 +34,20 @@ export class BrandService {
   }
 
   //GetAllBrand
-  async findAll(): Promise<{
-    status: string;
-    code: number;
-    message: string;
-    data: Brand[];
-  }> {
-    const brands = await this.brandRepository.find();
-    return {
-      status: 'success',
-      code: 200,
-      message: 'get all brand successfully',
-      data: brands,
-    };
+  async findAll(): Promise<Brand[]> {
+    try {
+      // console.log('Attempting to fetch all brands...');
+      const brands = await this.brandRepository.find();
+      // console.log('Brands retrieved:', brands);
+      if (!brands || brands.length === 0) {
+        // console.log('No brands found.');
+        return [];
+      }
+      return brands;
+    } catch (error) {
+      // console.error('Failed to retrieve brands:', error.message);
+      throw new Error('Failed to retrieve brands');
+    }
   }
 
   //GetBrandById

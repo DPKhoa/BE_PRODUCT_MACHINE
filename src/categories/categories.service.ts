@@ -39,22 +39,16 @@ export class CategoriesService {
     return this.categoryRespository.save(category);
   }
 
-  async findAll(): Promise<{
-    status: string;
-    code: number;
-    message: string;
-    data: Category[];
-  }> {
+  async findAll(): Promise<Category[]> {
     try {
       const categories = await this.categoryRespository.find({
         where: { status: true },
       });
-      return {
-        status: 'success',
-        code: 200,
-        message: 'get all categories successfully',
-        data: categories,
-      };
+      if (!categories || categories.length === 0) {
+        // console.log('No brands found.');
+        return [];
+      }
+      return categories;
     } catch (error) {
       throw new Error('Failed to retrieve categories');
     }

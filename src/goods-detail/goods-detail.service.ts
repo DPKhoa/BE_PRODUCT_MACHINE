@@ -1,3 +1,6 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { CreateGoodsDetailDto } from './dto/create-goods-detail.dto';
 import { UpdateGoodsDetailDto } from './dto/update-goods-detail.dto';

@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   Res,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import CreateCategoryDto from './dto/create-category.dto';
@@ -26,12 +27,23 @@ export class CategoriesController {
 
   @Get('getAllCategory')
   async findAll() {
-    const result = await this.categoriesService.findAll();
-    return {
-      status: HttpStatus.OK,
-      message: result.message,
-      data: result.data,
-    };
+    try {
+      const result = await this.categoriesService.findAll();
+      if (!result || result.length === 0) {
+        throw new BadRequestException('No brands found');
+      }
+      return {
+        status: 'success',
+        code: 200,
+        message: 'All brands retrieved successfully',
+        data: result,
+      };
+    } catch (error) {
+      throw new BadRequestException('Something bad happened', {
+        cause: new Error(),
+        description: 'Some error description ',
+      });
+    }
   }
 
   @Get(':id')

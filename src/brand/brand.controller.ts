@@ -25,13 +25,13 @@ export class BrandController {
 
   @Post('createBrand')
   async create(@Body() createBrandDto: CreateBrandDto): Promise<Brand> {
-    return await this.brandService.create(createBrandDto);
+    return await this.brandService.createBrand(createBrandDto);
   }
 
   @Get('getAllBrand')
-  async findAll() {
+  async getAllBrand() {
     try {
-      const result = await this.brandService.findAll();
+      const result = await this.brandService.getAllBrand();
       if (!result || result.length === 0) {
         throw new BadRequestException('No brands found');
       }
@@ -48,11 +48,14 @@ export class BrandController {
       });
     }
   }
+
+  //getBrandById
   @Get('getBrandBy/:id')
-  findOne(@Param('id') id: number) {
-    return this.brandService.findOne(+id);
+  getBrandById(@Param('id') id: number) {
+    return this.brandService.getBrandById(+id);
   }
 
+  //updateBrand
   @Patch('updateBrand/:id')
   async updateBrand(
     @Param('id') id: number,
@@ -61,6 +64,7 @@ export class BrandController {
     return this.brandService.updateBrand(+id, updateBrandDto);
   }
 
+  //deleteBrand
   @Delete('deleteBrand/:id')
   async deleteBrand(
     @Param('id', ParseIntPipe) id: number,

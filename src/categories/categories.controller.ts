@@ -20,15 +20,17 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
+  //createCategory
   @Post('createCategory')
   async create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoriesService.create(createCategoryDto);
+    return this.categoriesService.createCategory(createCategoryDto);
   }
 
+  //getAllCategory
   @Get('getAllCategory')
-  async findAll() {
+  async getAllCategory() {
     try {
-      const result = await this.categoriesService.findAll();
+      const result = await this.categoriesService.getAllCategory();
       if (!result || result.length === 0) {
         throw new BadRequestException('No categories found');
       }
@@ -46,11 +48,13 @@ export class CategoriesController {
     }
   }
 
+  //getCategoryById
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.categoriesService.findOne(+id);
+  getCategoryById(@Param('id') id: number) {
+    return this.categoriesService.getCategoryById(+id);
   }
 
+  //updateCategory
   @Patch('updateCategory/:id')
   async updateCategory(
     @Param('id') id: number,
@@ -58,7 +62,7 @@ export class CategoriesController {
   ) {
     return this.categoriesService.updateCategory(+id, updateCategoryDto);
   }
-
+  //deleteCategory
   @Delete('deleteCategory/:id')
   async deleteCategory(
     @Param('id', ParseIntPipe) id: number,

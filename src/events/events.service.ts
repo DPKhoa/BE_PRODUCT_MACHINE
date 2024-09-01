@@ -32,7 +32,7 @@ export class EventsService {
     return saveEvent;
   }
 
-  async findAll(): Promise<Event[]> {
+  async getAllEvents(): Promise<Event[]> {
     try {
       const events = await this.eventRepository.find({
         where: { status: true },
@@ -46,7 +46,7 @@ export class EventsService {
     }
   }
 
-  async findOne(eventId: number): Promise<Event> {
+  async getEventById(eventId: number): Promise<Event> {
     const event = await this.eventRepository.findOne({ where: { eventId } });
     if (!event) {
       throw new NotFoundException(`Event with ID ${eventId} not found`);

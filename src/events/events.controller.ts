@@ -21,10 +21,11 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post('createEvent')
-  async create(@Body() createEventDto: CreateEventDto) {
+  async createEvent(@Body() createEventDto: CreateEventDto) {
     try {
       return {
         status: 'success',
+        code: 200,
         data: await this.eventsService.createEvent(createEventDto),
       };
     } catch (error) {
@@ -33,9 +34,9 @@ export class EventsController {
   }
 
   @Get('getAllEvent')
-  async findAll() {
+  async getAllEvent() {
     try {
-      const events = await this.eventsService.findAll();
+      const events = await this.eventsService.getAllEvents();
       if (!events || events.length === 0) {
         throw new BadRequestException('No events found');
       }
@@ -57,12 +58,15 @@ export class EventsController {
   }
 
   @Get('getEventBy/:id')
-  findOne(@Param('id') id: string) {
-    return this.eventsService.findOne(+id);
+  getEventById(@Param('id') id: string) {
+    return this.eventsService.getEventById(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
+  async updateEvent(
+    @Param('id') id: string,
+    @Body() updateEventDto: UpdateEventDto,
+  ) {
     return this.eventsService.updateEvent(+id, updateEventDto);
   }
 

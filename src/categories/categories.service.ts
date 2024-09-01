@@ -26,7 +26,9 @@ export class CategoriesService {
     private readonly productRepository: Repository<Product>,
   ) {}
 
-  async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
+  async createCategory(
+    createCategoryDto: CreateCategoryDto,
+  ): Promise<Category> {
     const { ...categoryDetails } = createCategoryDto;
 
     const category = this.categoryRespository.create({
@@ -39,7 +41,7 @@ export class CategoriesService {
     return this.categoryRespository.save(category);
   }
 
-  async findAll(): Promise<Category[]> {
+  async getAllCategory(): Promise<Category[]> {
     try {
       const categories = await this.categoryRespository.find({
         where: { status: true },
@@ -55,7 +57,7 @@ export class CategoriesService {
     }
   }
 
-  async findOne(categoryId: number) {
+  async getCategoryById(categoryId: number) {
     const category = await this.categoryRespository.findOne({
       where: { categoryId, status: true },
     });

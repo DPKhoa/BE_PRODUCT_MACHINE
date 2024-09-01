@@ -24,7 +24,7 @@ export class BrandService {
   ) {}
 
   //CreateBrand
-  async create(createBrandDto: CreateBrandDto): Promise<Brand> {
+  async createBrand(createBrandDto: CreateBrandDto): Promise<Brand> {
     const brand = this.brandRepository.create({
       ...createBrandDto,
       createdAt: new Date(),
@@ -34,7 +34,7 @@ export class BrandService {
   }
 
   //GetAllBrand
-  async findAll(): Promise<Brand[]> {
+  async getAllBrand(): Promise<Brand[]> {
     try {
       // console.log('Attempting to fetch all brands...');
       const brands = await this.brandRepository.find();
@@ -51,7 +51,7 @@ export class BrandService {
   }
 
   //GetBrandById
-  async findOne(brandId: number): Promise<Brand> {
+  async getBrandById(brandId: number): Promise<Brand> {
     const brand = await this.brandRepository.findOne({ where: { brandId } });
     if (!brand) {
       throw new NotFoundException(`Brand with ID ${brandId} not found`);
@@ -59,6 +59,7 @@ export class BrandService {
     return brand;
   }
 
+  //updateBrand
   async updateBrand(brandId: number, updateBrandDto: UpdateBrandDto) {
     const brand = await this.brandRepository.findOne({ where: { brandId } });
     if (!brand) {
@@ -70,6 +71,7 @@ export class BrandService {
     return this.brandRepository.save(brand);
   }
 
+  //deletebrand
   async deleteBrand(brandId: number): Promise<{ message: string }> {
     const brand = await this.brandRepository.findOne({ where: { brandId } });
     if (!brand) {

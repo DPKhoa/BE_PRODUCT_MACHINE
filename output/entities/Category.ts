@@ -10,9 +10,6 @@ import { Product } from './Product';
 @Index('UQ__CATEGORY__D54EE9B5CB93795A', ['categoryId'], { unique: true })
 @Entity('CATEGORY', { schema: 'dbo' })
 export class Category {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'category_id' })
-  categoryId: number;
-
   @Column('nvarchar', { name: 'name', nullable: true, length: 255 })
   name: string | null;
 
@@ -24,6 +21,9 @@ export class Category {
 
   @Column('datetime', { name: 'updated_at', nullable: true })
   updatedAt: Date | null;
+
+  @PrimaryGeneratedColumn({ type: 'int', name: 'category_id' })
+  categoryId: number;
 
   @OneToMany(() => Product, (product) => product.category)
   products: Product[];

@@ -11,6 +11,7 @@ import {
   Res,
   HttpStatus,
   BadRequestException,
+  HttpException,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -47,12 +48,14 @@ export class EventsController {
         data: events,
       };
     } catch (error) {
-      throw (
-        (new BadRequestException('Something bad happened'),
+      throw new HttpException(
         {
-          cause: new Error(),
-          description: 'Some error description',
-        })
+          status: 'error',
+          code: 500,
+          message: 'Internal server error',
+          description: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }

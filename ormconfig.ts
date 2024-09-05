@@ -11,7 +11,7 @@ const config: SqlServerConnectionOptions = {
   password: '123',
   database: 'DB_MACHINE',
   // entities: ['dist/**/*.entity{.ts,.js}'],
-  entities: [__dirname + '/**/*.entity{.ts,.js}'],
+  entities: [__dirname + '/../**/*.entity.{ts,js}'],
   synchronize: true,
   extra: {
     trustServerCertificate: true,

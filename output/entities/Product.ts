@@ -10,19 +10,16 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Combo } from './Combo';
-import { Event } from './Event';
 import { GoodsDetail } from './GoodsDetail';
 import { ImgProduct } from './ImgProduct';
 import { OrderDetail } from './OrderDetail';
-import { Brand } from './Brand';
 import { Category } from './Category';
+import { Brand } from './Brand';
+import { EventDetail } from './EventDetail';
 
 @Index('UQ__PRODUCT__47027DF48D96652A', ['productId'], { unique: true })
 @Entity('PRODUCT', { schema: 'dbo' })
 export class Product {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'product_id' })
-  productId: number;
-
   @Column('nvarchar', { name: 'name', nullable: true, length: 255 })
   name: string | null;
 
@@ -50,6 +47,9 @@ export class Product {
   @Column('nvarchar', { name: 'guarantee', nullable: true, length: 10 })
   guarantee: string | null;
 
+  @PrimaryGeneratedColumn({ type: 'int', name: 'product_id' })
+  productId: number;
+
   @ManyToMany(() => Combo, (combo) => combo.products)
   @JoinTable({
     name: 'COMBO_DETAIL',
@@ -59,14 +59,8 @@ export class Product {
   })
   combos: Combo[];
 
-  @ManyToMany(() => Event, (event) => event.products)
-  @JoinTable({
-    name: 'EVENT_DETAIL',
-    joinColumns: [{ name: 'product_id', referencedColumnName: 'productId' }],
-    inverseJoinColumns: [{ name: 'event_id', referencedColumnName: 'eventId' }],
-    schema: 'dbo',
-  })
-  events: Event[];
+  @OneToMany(() => EventDetail, (eventDetail) => eventDetail.product)
+  eventDetail: EventDetail[];
 
   @OneToMany(() => GoodsDetail, (goodsDetail) => goodsDetail.product)
   goodsDetails: GoodsDetail[];
@@ -77,11 +71,11 @@ export class Product {
   @OneToMany(() => OrderDetail, (orderDetail) => orderDetail.product)
   orderDetails: OrderDetail[];
 
-  @ManyToOne(() => Brand, (brand) => brand.products)
-  @JoinColumn([{ name: 'brand_id', referencedColumnName: 'brandId' }])
-  brand: Brand;
-
   @ManyToOne(() => Category, (category) => category.products)
   @JoinColumn([{ name: 'category', referencedColumnName: 'categoryId' }])
   category: Category;
+
+  @ManyToOne(() => Brand, (brand) => brand.products)
+  @JoinColumn([{ name: 'brand_id', referencedColumnName: 'brandId' }])
+  brand: Brand;
 }

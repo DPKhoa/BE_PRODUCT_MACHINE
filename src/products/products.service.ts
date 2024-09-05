@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -13,6 +14,8 @@ import { Repository } from 'typeorm';
 import { Brand } from 'output/entities/Brand';
 import { Category } from 'output/entities/Category';
 import { ProductResponseDto } from './dto/product-respone.dto';
+import { Event } from 'output/entities/Event';
+import { EventDetail } from 'output/entities/EventDetail';
 
 @Injectable()
 export class ProductsService {
@@ -23,6 +26,10 @@ export class ProductsService {
     private readonly brandRepository: Repository<Brand>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(Event)
+    private readonly eventRespository: Repository<Event>,
+    @InjectRepository(EventDetail)
+    private readonly eventDetailRepository: Repository<EventDetail>,
   ) {}
 
   async createProduct(createProductDto: CreateProductDto): Promise<Product> {
@@ -46,6 +53,9 @@ export class ProductsService {
     if (!brand) {
       throw new BadRequestException(`Brand with Id ${brandId} does not exist`);
     }
+
+    //Kiểm tra Event
+
     // Tạo sản phẩm
     const product = this.productResponsitory.create({
       ...productDetails,
@@ -66,7 +76,7 @@ export class ProductsService {
     try {
       const products = await this.productResponsitory.find({
         where: { status: true },
-        relations: ['category', 'brand'], // Load the related data
+        relations: ['category', 'brand', 'eventDetail', 'eventDetail.events'], // Load the related data
       });
 
       const pickProductFields = (product: Product): ProductResponseDto => {
@@ -82,6 +92,7 @@ export class ProductsService {
           updatedAt,
           category,
           brand,
+          eventDetail,
         } = product;
 
         return {
@@ -108,6 +119,15 @@ export class ProductsService {
                 image: brand.image,
               }
             : null,
+          events:
+            eventDetail && eventDetail.length > 0
+              ? eventDetail.map((eventdetail) => ({
+                  eventid: eventdetail.eventId,
+                  productid: eventdetail.productId,
+                  discount: eventdetail.events.discount || null,
+                  image: eventdetail.events.image || null,
+                }))
+              : null,
         };
       };
 
@@ -141,11 +161,13 @@ export class ProductsService {
     productId: number,
     updateProductDto: UpdateProductDto,
   ): Promise<Product> {
-    const { categoryId, brandId, ...productDetails } = updateProductDto;
-
+    const { categoryId, brandId, eventId, ...productDetails } =
+      updateProductDto;
+    console.log('Update Product DTO:', updateProductDto);
     //Kiểm tra Product có tồn tại hay không?
     const product = await this.productResponsitory.findOne({
       where: { productId, status: true },
+      relations: ['category', 'brand', 'eventDetail'],
     });
     if (!product) {
       throw new NotFoundException(`Product with ID ${productId} not found`);
@@ -171,12 +193,43 @@ export class ProductsService {
           `Brand with Id ${brandId} does not exist`,
         );
       }
+      product.brand = brand;
+    }
+    if (eventId) {
+      const events = await this.eventRespository.findOne({
+        where: { eventId: eventId },
+      });
+
+      if (!events) {
+        throw new BadRequestException(
+          `Event with Id ${eventId} does not exsit`,
+        );
+      }
+      if (!product.productId) {
+        throw new BadRequestException(`Product ID is missing or invalid`);
+      }
+      let eventDetail = product.eventDetail.find(
+        (detail) => detail.eventId === eventId,
+      );
+      if (!eventDetail) {
+        eventDetail = this.eventDetailRepository.create({
+          productId: product.productId,
+          eventId: events.eventId,
+          product,
+          events: events,
+        });
+      }
+      // console.log('Product ID:', eventDetail.productId);
+
+      await this.eventDetailRepository.save(eventDetail);
     }
 
     //Cập nhật Product
-    Object.assign(product, updateProductDto);
+    Object.assign(product, productDetails);
 
-    return this.productResponsitory.save(product);
+    const updatedProduct = this.productResponsitory.save(product);
+    console.log('updatedProduct :>> ', updatedProduct);
+    return updatedProduct;
   }
 
   async deleteProduct(productId: number): Promise<{ message: string }> {

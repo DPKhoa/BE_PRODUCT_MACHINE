@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { Order } from './Order';
 import { Product } from './Product';
+import { Order } from './Order';
 
 @Entity('ORDER_DETAIL', { schema: 'dbo' })
 export class OrderDetail {
@@ -13,11 +13,11 @@ export class OrderDetail {
   @Column('int', { name: 'price', nullable: true })
   price: number | null;
 
-  @ManyToOne(() => Order, (order) => order.orderDetails)
-  @JoinColumn([{ name: 'order_id', referencedColumnName: 'orderId' }])
-  order: Order;
-
   @ManyToOne(() => Product, (product) => product.orderDetails)
   @JoinColumn([{ name: 'product_id', referencedColumnName: 'productId' }])
   product: Product;
+
+  @ManyToOne(() => Order, (order) => order.orderDetails)
+  @JoinColumn([{ name: 'order_id', referencedColumnName: 'orderId' }])
+  order: Order;
 }

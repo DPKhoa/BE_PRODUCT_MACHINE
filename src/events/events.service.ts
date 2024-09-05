@@ -1,12 +1,17 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Event } from 'output/entities/Event';
 import { Repository } from 'typeorm';
+import { EventResponseDto } from './dto/event-reponse.dto';
 
 @Injectable()
 export class EventsService {
@@ -32,17 +37,20 @@ export class EventsService {
     return saveEvent;
   }
 
-  async getAllEvents(): Promise<Event[]> {
+  async getAllEvents(): Promise<EventResponseDto[]> {
     try {
-      const events = await this.eventRepository.find({
-        where: { status: true },
-      });
-      if (!events || events.length === 0) {
-        return [];
-      }
-      return events;
+      const events = await this.eventRepository.find();
+      return events.map((event) => ({
+        eventId: event.eventId,
+        discount: event.discount,
+        name: event.name,
+        cost: event.cost,
+        image: event.image,
+        price: event.price,
+        status: event.status,
+      }));
     } catch (error) {
-      throw new Error('Failed to retrieve events');
+      throw new BadRequestException('Failed to retrieve events');
     }
   }
 

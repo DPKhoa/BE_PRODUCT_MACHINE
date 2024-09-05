@@ -1,21 +1,17 @@
+/* eslint-disable prettier/prettier */
 import {
   Column,
   Entity,
   Index,
-  ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Product } from './Product';
+
+import { EventDetail } from './EventDetail';
 
 @Index('UQ__EVENT__2370F7268B1993F5', ['eventId'], { unique: true })
 @Entity('EVENT', { schema: 'dbo' })
 export class Event {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'event_id' })
-  eventId: number;
-
-  @Column('int', { name: 'discount', nullable: true })
-  discount: number | null;
-
   @Column('nvarchar', { name: 'name', nullable: true, length: 255 })
   name: string | null;
 
@@ -28,9 +24,15 @@ export class Event {
   @Column('int', { name: 'price', nullable: true })
   price: number | null;
 
-  @Column('bit', { name: 'status', nullable: true })
-  status: boolean; // Ensure this matches your DTO
+  @Column('int', { name: 'discount', nullable: true })
+  discount: number | null;
 
-  @ManyToMany(() => Product, (product) => product.events)
-  products: Product[];
+  @PrimaryGeneratedColumn({ type: 'int', name: 'event_id' })
+  eventId: number;
+
+  @Column('bit', { name: 'status', nullable: true })
+  status: boolean | null;
+
+  @OneToMany(() => EventDetail, (eventDetail) => eventDetail.events)
+  eventDetail: EventDetail[];
 }

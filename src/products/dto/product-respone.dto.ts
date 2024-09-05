@@ -20,4 +20,12 @@ export class ProductResponseDto {
     name: string;
     image: string;
   } | null;
+  events:
+    | {
+        eventid: number;
+        productid: number;
+        discount: number;
+        image: string;
+      }[]
+    | null;
 }

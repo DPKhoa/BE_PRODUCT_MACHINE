@@ -54,7 +54,7 @@ export class ProductsController {
 
   @Patch('updateProduct/:id')
   async update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateProductDto: UpdateProductDto,
   ) {
     return this.productsService.updateProduct(+id, updateProductDto);

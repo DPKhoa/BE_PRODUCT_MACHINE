@@ -22,10 +22,9 @@ export class ProductResponseDto {
   } | null;
   events:
     | {
-        eventid: number;
-        productid: number;
+        id: number;
         discount: number;
         image: string;
       }[]
-    | null;
+    | null; // Ensure this is an array
 }

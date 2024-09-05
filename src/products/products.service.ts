@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   BadRequestException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -15,7 +14,6 @@ import { Brand } from 'output/entities/Brand';
 import { Category } from 'output/entities/Category';
 import { ProductResponseDto } from './dto/product-respone.dto';
 import { Event } from 'output/entities/Event';
-import { EventDetail } from 'output/entities/EventDetail';
 
 @Injectable()
 export class ProductsService {
@@ -27,9 +25,7 @@ export class ProductsService {
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
     @InjectRepository(Event)
-    private readonly eventRespository: Repository<Event>,
-    @InjectRepository(EventDetail)
-    private readonly eventDetailRepository: Repository<EventDetail>,
+    private readonly eventRepository: Repository<Event>,
   ) {}
 
   async createProduct(createProductDto: CreateProductDto): Promise<Product> {
@@ -76,7 +72,7 @@ export class ProductsService {
     try {
       const products = await this.productResponsitory.find({
         where: { status: true },
-        relations: ['category', 'brand', 'eventDetail', 'eventDetail.events'], // Load the related data
+        relations: ['category', 'brand', 'events'], // Load the related data
       });
 
       const pickProductFields = (product: Product): ProductResponseDto => {
@@ -92,7 +88,7 @@ export class ProductsService {
           updatedAt,
           category,
           brand,
-          eventDetail,
+          events,
         } = product;
 
         return {
@@ -120,12 +116,11 @@ export class ProductsService {
               }
             : null,
           events:
-            eventDetail && eventDetail.length > 0
-              ? eventDetail.map((eventdetail) => ({
-                  eventid: eventdetail.eventId,
-                  productid: eventdetail.productId,
-                  discount: eventdetail.events.discount || null,
-                  image: eventdetail.events.image || null,
+            events && events.length > 0
+              ? events.map((event) => ({
+                  id: event.eventId,
+                  discount: event.discount,
+                  image: event.image,
                 }))
               : null,
         };
@@ -142,7 +137,7 @@ export class ProductsService {
   async findOne(productId: number): Promise<Product> {
     const product = await this.productResponsitory.findOne({
       where: { productId, status: true },
-      relations: ['category', 'brand'],
+      relations: ['category', 'brand', 'events'],
     });
     if (!product) {
       throw new NotFoundException(`Product with ID ${productId} not found`);
@@ -154,6 +149,12 @@ export class ProductsService {
             ...product.category,
           }
         : null,
+      brand: product.brand
+        ? {
+            ...product.brand,
+          }
+        : null,
+      events: product.events ? { ...product.events } : null,
     };
   }
 
@@ -167,7 +168,7 @@ export class ProductsService {
     //Kiểm tra Product có tồn tại hay không?
     const product = await this.productResponsitory.findOne({
       where: { productId, status: true },
-      relations: ['category', 'brand', 'eventDetail'],
+      relations: ['category', 'brand', 'events'],
     });
     if (!product) {
       throw new NotFoundException(`Product with ID ${productId} not found`);
@@ -196,7 +197,7 @@ export class ProductsService {
       product.brand = brand;
     }
     if (eventId) {
-      const events = await this.eventRespository.findOne({
+      const events = await this.eventRepository.findOne({
         where: { eventId: eventId },
       });
 
@@ -205,23 +206,7 @@ export class ProductsService {
           `Event with Id ${eventId} does not exsit`,
         );
       }
-      if (!product.productId) {
-        throw new BadRequestException(`Product ID is missing or invalid`);
-      }
-      let eventDetail = product.eventDetail.find(
-        (detail) => detail.eventId === eventId,
-      );
-      if (!eventDetail) {
-        eventDetail = this.eventDetailRepository.create({
-          productId: product.productId,
-          eventId: events.eventId,
-          product,
-          events: events,
-        });
-      }
-      // console.log('Product ID:', eventDetail.productId);
-
-      await this.eventDetailRepository.save(eventDetail);
+      product.events = [events];
     }
 
     //Cập nhật Product
@@ -235,7 +220,7 @@ export class ProductsService {
   async deleteProduct(productId: number): Promise<{ message: string }> {
     const product = await this.productResponsitory.findOne({
       where: { productId, status: true },
-      relations: ['category', 'brand'],
+      relations: ['category', 'brand', 'events'],
     });
     if (!product) {
       throw new NotFoundException(`Product với ID ${productId} không tìm thấy`);
@@ -243,6 +228,7 @@ export class ProductsService {
     const category = product.category;
 
     const brand = product.brand;
+    const events = product.events;
     await this.productResponsitory.remove(product);
 
     if (category) {
@@ -260,6 +246,14 @@ export class ProductsService {
       });
       if (productInBrand.length === 0) {
         await this.brandRepository.remove(brand);
+      }
+    }
+    if (events) {
+      const productInEvent = await this.productResponsitory.find({
+        where: { events },
+      });
+      if (productInEvent.length === 0) {
+        await this.eventRepository.remove(events);
       }
     }
     return { message: `Product với ID ${productId} đã được xóa thành công` };

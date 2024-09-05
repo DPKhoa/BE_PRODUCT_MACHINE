@@ -1,13 +1,12 @@
-/* eslint-disable prettier/prettier */
 import {
   Column,
   Entity,
   Index,
-  OneToMany,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-
-import { EventDetail } from './EventDetail';
+import { Product } from './Product';
 
 @Index('UQ__EVENT__2370F7268B1993F5', ['eventId'], { unique: true })
 @Entity('EVENT', { schema: 'dbo' })
@@ -33,6 +32,14 @@ export class Event {
   @Column('bit', { name: 'status', nullable: true })
   status: boolean | null;
 
-  @OneToMany(() => EventDetail, (eventDetail) => eventDetail.events)
-  eventDetail: EventDetail[];
+  @ManyToMany(() => Product, (product) => product.events)
+  @JoinTable({
+    name: 'EVENT_DETAIL',
+    joinColumns: [{ name: 'event_id', referencedColumnName: 'eventId' }],
+    inverseJoinColumns: [
+      { name: 'product_id', referencedColumnName: 'productId' },
+    ],
+    schema: 'dbo',
+  })
+  products: Product[];
 }

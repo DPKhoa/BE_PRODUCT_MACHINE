@@ -10,12 +10,12 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Combo } from './Combo';
+import { Event } from './Event';
 import { GoodsDetail } from './GoodsDetail';
 import { ImgProduct } from './ImgProduct';
 import { OrderDetail } from './OrderDetail';
 import { Category } from './Category';
 import { Brand } from './Brand';
-import { EventDetail } from './EventDetail';
 
 @Index('UQ__PRODUCT__47027DF48D96652A', ['productId'], { unique: true })
 @Entity('PRODUCT', { schema: 'dbo' })
@@ -59,8 +59,8 @@ export class Product {
   })
   combos: Combo[];
 
-  @OneToMany(() => EventDetail, (eventDetail) => eventDetail.product)
-  eventDetail: EventDetail[];
+  @ManyToMany(() => Event, (event) => event.products)
+  events: Event[];
 
   @OneToMany(() => GoodsDetail, (goodsDetail) => goodsDetail.product)
   goodsDetails: GoodsDetail[];

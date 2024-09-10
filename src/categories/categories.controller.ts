@@ -23,7 +23,13 @@ export class CategoriesController {
   //createCategory
   @Post('createCategory')
   async create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoriesService.createCategory(createCategoryDto);
+    const invalidChars = /[^\w\s.,-]/;
+    if (invalidChars.test(createCategoryDto.name)) {
+      throw new Error('Tên hoặc mô tả chứa ký tự không hợp lệ');
+    }
+    const newCategory = { ...createCategoryDto };
+
+    return await this.categoriesService.createCategory(newCategory);
   }
 
   //getAllCategory
